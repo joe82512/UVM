@@ -1,0 +1,67 @@
+// Code your testbench here
+// or browse Examples
+
+`timescale 1ns/1ps
+`include "uvm_macros.svh"
+
+import uvm_pkg::*;
+`include "my_if.sv"
+`include "my_driver.sv"
+
+module top_tb;
+
+    reg clk;
+    reg rst_n;
+    reg[7:0] rxd;
+    reg rx_dv;
+    wire[7:0] txd;
+    wire tx_en;
+
+    /* 2.2.4 : interface */
+    my_if input_if(clk, rst_n);
+    my_if output_if(clk, rst_n);
+
+    dut my_dut(
+        .clk(clk),
+        .rst_n(rst_n),
+        .rxd(input_if.data),    //.rxd(rxd),
+        .rx_dv(input_if.valid), //.rx_dv(rx_dv),
+        .txd(output_if.data),   //.txd(txd),
+        .tx_en(output_if.valid) //.tx_en(tx_en)
+    );
+
+    /* 2.2.1 : basic */
+    // initial begin
+    //     my_driver drv;
+    //     drv = new("drv", null);
+    //     drv.main_phase(null);
+    //     $finish();
+    // end
+
+    /* 2.2.2+2.2.3 : factory + objection */
+    initial begin
+        run_test("my_driver"); //自動建立 "uvm_test_top"
+    end
+
+    /* 2.2.4 : interface */
+    initial begin
+        // 綁定 top(testbench) 跟 driver 的 virtual interface : uvm_config_db<set> 靜態函數
+        uvm_config_db#(virtual my_if)::set(null, "uvm_test_top", "vif", input_if);
+    end
+
+    initial begin
+        clk = 0;
+        forever begin
+            #100 clk = ~clk;
+        end
+    end
+
+    initial begin
+        rst_n = 1'b0;
+        #1000;
+        rst_n = 1'b1;
+    end
+
+    
+
+endmodule
