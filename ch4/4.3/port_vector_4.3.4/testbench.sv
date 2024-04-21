@@ -21,7 +21,7 @@ import uvm_pkg::*;
 `include "my_driver.sv"
 `include "my_monitor.sv"
 `include "my_agent.sv"
-`include "my_model.sv"
+`include "my_model.sv" //analysis_port[16]
 
 // `include "my_scoreboard_IMP.sv"
 // `include "my_env_IMP.sv"
